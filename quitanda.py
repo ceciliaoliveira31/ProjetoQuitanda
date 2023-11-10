@@ -41,6 +41,26 @@ def index():
     title = "Home"
     return render_template("home.html", produtos=produtos, title=title)
 
+#ROTA DA PÁGINA LOGIN
+@app.route("/login")
+def login():
+    title="Login"
+    return render_template("login.html",title=title)
+
+#ROTA DA PÁGINA DE ACESSO
+@app.route("/acesso", methods=['post'])
+def acesso():
+    global usuario, senha
+    usuario_informado = request.form["usuario"]
+    senha_informada = request.form["senha"]
+    if usuario == usuario_informado and senha == senha_informada:
+        session["login"] = True
+        return redirect('/adm')
+    else:
+        return render_template("login.html",msg="Usuário/Senha estão incorretos!")
+
+
+
 
 #FINAL DO CÓDIGO - EXECUTANDO O SERVIDOR
 app.run(debug=True)

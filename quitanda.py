@@ -120,7 +120,7 @@ def excluir(id):
     if verifica_sessao():
         id=int(id)
         conexao = conecta_database()
-        conexao.execute('DELETE FROM produtos WHERE id_prod = ?', (id))
+        conexao.execute('DELETE FROM produtos WHERE id_prod = ?', (id,))
         conexao.commit()
         conexao.close()
         return redirect('/adm')
@@ -171,6 +171,7 @@ def busca():
     produtos = conexao.execute('SELECT * FROM produtos WHERE nome_prod LIKE "%" || ? || "%" ', (busca,)).fetchall()
     title = "Home"
     return render_template("home.html", produtos=produtos, title=title)
+
 
 
 

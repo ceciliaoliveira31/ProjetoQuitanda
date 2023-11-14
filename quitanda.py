@@ -88,7 +88,7 @@ def logout():
 def cadprodutos():
     if verifica_sessao():
         title = "Cadastro de produtos"
-        return render_template("cdprodutos.html",title=title)
+        return render_template("cadprodutos.html",title=title)
     else:
         return redirect("/login")
     
@@ -100,7 +100,7 @@ def cadastro():
         nome_prod=request.form['nome_prod']
         desc_prod=request.form['desc_prod']
         preco_prod=request.form['preco_prod']
-        img_prod=request.form['img_prod']
+        img_prod=request.files['img_prod']
         id_foto=str(uuid.uuid4().hex)
         filename=id_foto+nome_prod+'.png'
         img_prod.save("static/img/produtos/"+filename)
@@ -111,6 +111,55 @@ def cadastro():
         return redirect("/adm")
     else:
         return redirect("/login")
+    
+
+
+#ROTA DE EXCLUSÃO
+@app.route("/excluir/<id>")
+def excluir(id):
+    if verifica_sessao():
+        id=int(id)
+        conexao = conecta_database()
+        conexao.execute('DELETE FROM produtos WHERE id_prod = ?', (id))
+        conexao.commit()
+        conexao.close()
+        return redirect('/adm')
+    else:
+        return redirect("/login")
+    
+
+
+#CRIAR A ROTA DO EDITAR
+@app.route("/editprodutos/<id_prod>")
+def editar(id_prod):
+    if verifica_sessao():
+        iniciar_db()
+        conexao = conecta_database()
+        produtos = conexao.execute('SELECT * FROM produtos WHERE id_prod = ?',(id_prod,)).fetchall() 
+        conexao.close()
+        title = "Edição de produtos"
+        return render_template("editprodutos.html", produtos=produtos, title=title)
+    else:
+        return redirect("/login")
+    
+
+
+#CRIAR A ROTA PARA TRATAR A EDIÇÃO
+@app.route("/editarprodutos", methods=['POST'])
+def editprod():
+    id_prod = request.form['id_prod']
+    nome_prod = request.form['nome_prod']
+    desc_prod = request.form['desc_prod']
+    preco_prod = request.form['preco_prod']
+    img_prod = request.files['img_prod']
+    id_foto=str(uuid.uuid4().hex)
+    filename=id_foto+nome_prod+'.png'
+    img_prod.save("static/img/produtos/"+filename)
+    conexao = conecta_database()
+    conexao.execute('UPDATE produtos SET name_prod = ?, desc_prod = ?, img_prod = ?, WHERE id_prod = ?', (nome_prod, desc_prod, preco_prod, filename, id_prod))
+    conexao.commit()
+    conexao.close()
+    return redirect('/adm')
 
 
 
